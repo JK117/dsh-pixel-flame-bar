@@ -35,7 +35,7 @@ const context = vm.createContext({
 
 vm.runInContext(source, context);
 
-assert.equal(registration.id, "dsh-plugin-session-lightbar");
+assert.equal(registration.id, "dsh-pixel-flame-bar");
 const plugin = registration.factory((name) => {
   assert.equal(name, "react", `unexpected require: ${name}`);
   return React;
@@ -44,8 +44,8 @@ const plugin = registration.factory((name) => {
 assert.deepEqual(Object.keys(plugin).sort(), ["apply", "inject"]);
 assert.deepEqual([...plugin.inject], ["slots"]);
 assert.equal(styles.length, 1);
-assert.equal(styles[0].dataset.plugin, "dsh-plugin-session-lightbar");
-assert.equal(styles[0].dataset.pluginCss, "dsh-plugin-session-lightbar/lightbar.css");
+assert.equal(styles[0].dataset.plugin, "dsh-pixel-flame-bar");
+assert.equal(styles[0].dataset.pluginCss, "dsh-pixel-flame-bar/lightbar.css");
 
 let registered;
 plugin.apply({
@@ -62,8 +62,8 @@ plugin.apply({
 });
 
 assert.equal(registered.options.name, "sidebar.footer.action");
-assert.equal(registered.options.id, "session-lightbar");
-assert.equal(registered.component.displayName, "SessionLightBar");
+assert.equal(registered.options.id, "pixel-flame-bar");
+assert.equal(registered.component.displayName, "PixelFlameBar");
 
 const running = new Map([
   ["s1", { running: false }],

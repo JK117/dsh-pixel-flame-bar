@@ -1,11 +1,11 @@
-/* Session light bar — browser half.
+/* Pixel flame bar — browser half.
  *
  * This file is a source template: `scripts/build.mjs` injects the stylesheet
  * from src/lightbar.css, inlines src/flame.js, and writes lib/client.js, which
  * is the bundle the DSH client module loader serves.
  */
 window.__ModuleLoader__.load({
-  id: "dsh-plugin-session-lightbar",
+  id: "dsh-pixel-flame-bar",
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;
@@ -13,7 +13,7 @@ window.__ModuleLoader__.load({
 
     const React = require("react");
 
-    const PLUGIN_ID = "dsh-plugin-session-lightbar";
+    const PLUGIN_ID = "dsh-pixel-flame-bar";
     const CSS_TAG_ID = PLUGIN_ID + "/lightbar.css";
     const CSS = __LIGHTBAR_CSS_JSON__;
 
@@ -55,7 +55,7 @@ window.__ModuleLoader__.load({
      * track, thumb, slider, or effort affordance: just cells whose alpha is
      * near zero when idle and random white sparkles while a session runs.
      */
-    function SessionLightBar({ wide, useSessionStatus }) {
+    function PixelFlameBar({ wide, useSessionStatus }) {
       // All hooks run before any layout shortcut: `wide` flips while the
       // sidebar collapses, and a conditional hook would change hook order.
       const running =
@@ -138,7 +138,7 @@ window.__ModuleLoader__.load({
       );
     }
 
-    SessionLightBar.displayName = "SessionLightBar";
+    PixelFlameBar.displayName = "PixelFlameBar";
 
     /** Registers the array into the sidebar's footer-action seat. */
     function apply(ctx) {
@@ -146,11 +146,11 @@ window.__ModuleLoader__.load({
         ctx.slots.register(
           {
             name: "sidebar.footer.action",
-            id: "session-lightbar",
+            id: "pixel-flame-bar",
             order: 40,
-            label: "Session light bar",
+            label: "Pixel flame bar",
           },
-          SessionLightBar,
+          PixelFlameBar,
         ),
       );
     }
