@@ -28,6 +28,7 @@ function createFlameRenderer(canvas) {
   let height = 0;
   let dpr = 1;
   let observer = null;
+  const themeObservers = [];
 
   function reduced() {
     return reduceQuery !== null && reduceQuery.matches === true;
@@ -82,10 +83,40 @@ function createFlameRenderer(canvas) {
 
   const palette = readPalette();
 
-  /** Map a cell's energy to the transparent -> DeepSeek blue -> white ramp. */
-  function pixelColor(energy, alpha) {
+  /**
+   * Light surfaces use a separate ramp: saturated deep blue at the low end
+   * (so low-alpha cells read blue, not grey) and a softer, less saturated
+   * peak. White is intentionally absent; on white it would disappear.
+   */
+  const lightPalette = {
+    deep: [29, 78, 216], // #1d4ed8
+    navy: [37, 99, 235], // #2563eb
+    royal: [59, 107, 245], // #3b6bf5
+    blue: [95, 126, 242], // #5f7ef2
+    peak: [122, 147, 240], // #7a93f0
+  };
+
+  /** The DSH theme marker lives on <body>; accept <html> as a fallback. */
+  function isLightTheme() {
+    if (typeof document === "undefined") return false;
+    const body = document.body;
+    const root = document.documentElement;
+    const dark =
+      (body !== null && body.hasAttribute("data-ds-dark-theme")) ||
+      (root !== null && root.hasAttribute("data-ds-dark-theme"));
+    return !dark;
+  }
+
+  /** Map a cell's energy to the active theme's transparent -> blue ramp. */
+  function pixelColor(energy, alpha, light) {
     let rgb;
-    if (energy >= 0.8) rgb = palette.white;
+    if (light) {
+      if (energy >= 0.8) rgb = lightPalette.peak;
+      else if (energy >= 0.58) rgb = lightPalette.blue;
+      else if (energy >= 0.38) rgb = lightPalette.royal;
+      else if (energy >= 0.18) rgb = lightPalette.navy;
+      else rgb = lightPalette.deep;
+    } else if (energy >= 0.8) rgb = palette.white;
     else if (energy >= 0.58) rgb = palette.blue200;
     else if (energy >= 0.38) rgb = palette.blue300;
     else if (energy >= 0.22) rgb = palette.blue400;
@@ -133,13 +164,17 @@ function createFlameRenderer(canvas) {
     const offsetX = Math.round(((width - (columns * pitch - gap)) / 2) * dpr) / dpr;
     const offsetY = Math.round(((height - (rows * pitch - gap)) / 2) * dpr) / dpr;
     const lvl = clamp(levelValue, 0, 1);
+    const light = isLightTheme();
 
     for (let row = 0; row < rows; row += 1) {
       for (let column = 0; column < columns; column += 1) {
         const seed = hash(column + 1, row + 3);
 
-        // Off state: every cell remains, but only as a whisper of white.
-        const idleAlpha = 0.035 + hash(column * 5 + 1, row * 7 + 2) * 0.055;
+        // Off state: every cell remains, but only as a whisper of blue. On
+        // light surfaces the same alpha reads grey, so lift it a little.
+        const idleAlpha =
+          (0.035 + hash(column * 5 + 1, row * 7 + 2) * 0.055) *
+          (light ? 1.4 : 1);
         // Running keeps a much fainter version of the same grid so the array
         // never disappears completely behind the sparkles.
         const baseAlpha = idleAlpha * 0.9;
@@ -192,7 +227,7 @@ function createFlameRenderer(canvas) {
             energy = clamp(energy, 0, 1.5);
             shade = energy;
             if (energy > 0.04) {
-              alpha += lvl * local * Math.min(energy, 1) * 1.5;
+              alpha += lvl * local * Math.min(energy, 1) * (light ? 1.6 : 1.5);
             }
           }
         }
@@ -204,7 +239,7 @@ function createFlameRenderer(canvas) {
         // Transparent at the dark end, DeepSeek blue in the middle, white at
         // the bright end. Alpha is the brightness; the hue follows the ramp.
         if (alpha < 0.012) continue;
-        ctx.fillStyle = pixelColor(shade, alpha);
+        ctx.fillStyle = pixelColor(shade, alpha, light);
         ctx.fillRect(x, y, cell, cell);
       }
     }
@@ -320,6 +355,10 @@ function createFlameRenderer(canvas) {
       observer.disconnect();
       observer = null;
     }
+    for (const themeObserver of themeObservers) {
+      themeObserver.disconnect();
+    }
+    themeObservers.length = 0;
     clear();
   }
 
@@ -327,6 +366,20 @@ function createFlameRenderer(canvas) {
     if (typeof ResizeObserver === "function") {
       observer = new ResizeObserver(resize);
       observer.observe(canvas);
+    }
+    if (
+      typeof MutationObserver === "function" &&
+      typeof document !== "undefined"
+    ) {
+      for (const target of [document.documentElement, document.body]) {
+        if (target === null) continue;
+        const themeObserver = new MutationObserver(resize);
+        themeObserver.observe(target, {
+          attributes: true,
+          attributeFilter: ["data-ds-dark-theme"],
+        });
+        themeObservers.push(themeObserver);
+      }
     }
     syncSize();
     drawPixels(0, 0);

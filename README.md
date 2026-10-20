@@ -1,10 +1,12 @@
 # dsh-plugin-session-lightbar
 
-侧边栏底部的「会话运行灯光条」：不再有滑轨、端点或 effort 开关，只剩一块**透明背景上的像素阵列**。所有会话空闲时，阵列仍在，但每个像素只有 3.5%–9% 的深蓝不透明度，几乎透明；任一会话运行时，像素按各自的随机噪声闪动，从 DeepSeek 主题蓝逐级提亮，峰值闪成白色。
+侧边栏底部的「会话运行灯光条」：不再有滑轨、端点或 effort 开关，只剩一块**透明背景上的像素阵列**。所有会话空闲时，阵列仍在，但每个像素只有 3.5%–9% 的深蓝不透明度，几乎透明；任一会话运行时，像素按各自的随机噪声闪动。深色主题下从 DeepSeek 主题蓝逐级提亮，峰值闪成白色；浅色主题下单独使用深蓝 → 柔和低饱和蓝，低亮度提高一点蓝色存在感，峰值不再高饱和，也不出现白色。
 
 视觉参考：[Crow5 复刻 Claude 璀星动画](https://www.xiaohongshu.com/discovery/item/6a47ccae000000001003e397?source=webshare&xhsshare=pc_web&xsec_token=ABjxQzN9DEl1QdEK8JQApDuaB2YbkMHZHVqnGlO4dZF-o=&xsec_source=pc_share) 的像素阵列语言；按你的要求已去掉滑块结构、波纹和紫色火光，改为透明底上的 DeepSeek 蓝随机火花，峰值白。
 
-![空闲 / 运行两态预览](preview/preview.png)
+![深色主题：DeepSeek 蓝 → 白](preview/preview.png)
+
+![浅色主题：深蓝 → 柔和低饱和蓝](preview/light.png)
 
 ## 效果
 
@@ -14,9 +16,11 @@
 - **运行**：每个像素独立按 9Hz / 2.1Hz 两层随机噪声闪动，各自有最多 0.5 秒的随机点火延迟；没有从左到右的前沿，也没有涟漪。
 - **底阵**：运行时保留一层约为空闲 alpha 90% 的底阵，阵列不会在火花之间变暗或消失。
 - **火花**：约 0.18 的像素被稀疏掩码压暗（只压到 45%，不会消失）；其余像素按噪声明暗；另有一层 6.5Hz 的稀有白色闪光。
-- **颜色阶梯**：颜色从 `deepseek-500` 逐级升到 `450 / 400 / 300 / 200`，峰值纯白；色值优先读取 DSH 主题的 `--dsw-static-deepseek-*`，读不到时使用同一组 fallback。
-- **透明到白色**：亮度同时由 alpha 和色相表达——越暗越透明、越偏深蓝，越亮越浅、越接近纯白，不会出现黑色块。
-- **蓝色光晕**：运行时 canvas 叠加一层 `drop-shadow` 蓝色光晕；浅色主题下额外用 `saturate(1.5)` 增强蓝色，避免在浅底上完全洗掉。
+- **颜色阶梯（深色）**：从 `deepseek-500` 逐级升到 `450 / 400 / 300 / 200`，峰值纯白；色值优先读取 DSH 主题的 `--dsw-static-deepseek-*`，读不到时使用同一组 fallback。浅色主题使用独立的深蓝 → 柔和低饱和蓝色阶。
+- **亮度与色相**：亮度同时由 alpha 和色相表达——越暗越透明、越偏深蓝；深色主题越亮越浅、接近纯白，浅色主题始终保持蓝色，但峰值降低饱和度，不会出现黑色块。
+- **双主题配色**：深色主题（`body[data-ds-dark-theme]`）保持 DeepSeek 蓝 → 白；浅色主题（无该标记）使用 `#1d4ed8` → `#2563eb` → `#3b6bf5` → `#5f7ef2` → `#7a93f0`。低亮度端用更饱和的深蓝，避免浅底上发灰；峰值端主动降低饱和度。
+- **自动切换**：`drawPixels` 每帧读取主题，并用 `MutationObserver` 监听 `data-ds-dark-theme`；空闲、静态或运行中切换主题都会重绘。
+- **蓝色光晕**：深色用 `brightness(1.15) + 3px 蓝晕`；浅色用 `saturate(0.95) + 2px 柔和蓝阴影`，避免在白底上洗掉。
 - **过渡**：由空闲阵列淡入随机火花、再淡回空闲阵列，约 0.35 秒；空闲后立即停止 `requestAnimationFrame`。
 - **边缘**：阵列最左、最右各 5px 用 mask 渐隐，避免像素在侧栏边缘硬切。
 - **减少动态效果**：`prefers-reduced-motion: reduce` 下只绘制一帧静态随机阵列，不跑循环。
@@ -62,8 +66,10 @@ dsh-plugin-session-lightbar/
 ├── docs/
 │   └── hdr-options.md     # 真 HDR 方案 2/3（设计文档，未实现）
 ├── preview/
-│   ├── index.html         # 空闲 / 运行两态预览
-│   └── preview.png        # README 截图
+│   ├── index.html         # 深色主题预览
+│   ├── light.html         # 浅色主题预览
+│   ├── preview.png        # 深色截图
+│   └── light.png          # 浅色截图
 └── cordis.patch.yml.before-lightbar  # 不含本插件的 profile 补丁快照
 ```
 
@@ -136,13 +142,17 @@ open "preview/index.html?at=0.4"
 | 快/慢噪声频率 | `src/flame.js` 中的 `time * 9`、`time * 2.1` |
 | 随机点火延迟 | `src/flame.js` 中的 `seed * 0.5` 与 `/ 0.32` |
 | 疏密 | `src/flame.js` 中的 `mask < 0.18`、`mask` 压暗系数 `0.45`、`energy < 0.04` |
-| 白色火花频率 | `src/flame.js` 中的 `sparkle > 0.985` |
-| 蓝色阶梯 / 白光阈值 | `src/flame.js` 的 `pixelColor` 中 0.8 / 0.58 / 0.38 / 0.22 / 0.08 阈值 |
+| 深色白色火花频率 | `src/flame.js` 中的 `sparkle > 0.985` |
+| 深色蓝色阶梯 / 白光阈值 | `src/flame.js` 的 `pixelColor` 中 0.8 / 0.58 / 0.38 / 0.22 / 0.08 阈值 |
 | 点击点亮时长 | `src/client.js` 中 `setTimeout(..., 5000)` |
-| 蓝色光晕 | `.dsh-sl[data-active="true"] .dsh-sl__pixels` 的 `drop-shadow(...)` |
-| 浅色增强 | `body:not([data-ds-dark-theme]) .dsh-sl[data-active="true"] .dsh-sl__pixels` 的 `saturate(1.5)` |
+| 深色光晕 | `.dsh-sl[data-active="true"] .dsh-sl__pixels` 的 `brightness(1.15) + drop-shadow(...)` |
+| 浅色色阶 | `src/flame.js` 的 `lightPalette`：deep / navy / royal / blue / peak |
+| 浅色低亮度 | `src/flame.js` 的 `idleAlpha` 浅色 ×1.4、alpha 增益浅色 ×1.6 |
+| 浅色阈值 | `pixelColor` 的 light 分支：0.8 / 0.58 / 0.38 / 0.18 |
+| 浅色光晕 | `:root:not([data-ds-dark-theme]) body:not([data-ds-dark-theme])` 下的 `saturate(0.95) + 2px 柔和蓝 drop-shadow` |
+| 主题切换 | `src/flame.js` 的 `isLightTheme()` 与 `MutationObserver`（`data-ds-dark-theme`） |
 | 像素颜色 / 亮度曲线 | `src/flame.js` 的 `pixelColor` 与 `Math.pow(noise, 1.45)` |
-| 运行亮度增益 | `src/flame.js` 的 `min(energy, 1) * 1.5` 与 CSS `brightness(1.15)` |
+| 深色运行亮度增益 | `src/flame.js` 的 `min(energy, 1) * 1.5` 与 CSS `brightness(1.15)` |
 | 全局淡入/淡出 | `src/flame.js` 中的 `delta / 0.35` |
 | 边缘渐隐 | `src/lightbar.css` 的 `mask-image`（5px） |
 
@@ -163,7 +173,7 @@ cp /Users/jkfan/AgentProjects/ToolsResearcher/dsh-plugin-session-lightbar/cordis
 
 ## 已知限制
 
-- **按深色侧边栏设计**：像素是深蓝→白 alpha；浅色下会用 `saturate(1.5)` 和蓝色 `drop-shadow` 让蓝格更实，但白色峰值在浅底上仍不如深色背景醒目。
+- **双主题配色**：深色是蓝→白；浅色是内置的深蓝→柔和低饱和蓝 `lightPalette`，低亮度用更饱和的深蓝避免发灰，峰值降低饱和度，不出现白色。浅色色值不依赖 DSH 语义 token，换主题 token 不会自动改浅色色值。
 - 只对 Web 客户端生效（`dsh.client.platform: "web"`），不影响 TUI/ACP。
 - 以绝对路径挂载，适合本地开发；要分发给别人，建议按官方 bundle 规范打包。
 - 它是一条普通 Loader 行，不是 bundle，因此不会出现在侧边栏「插件」页的 bundle 列表里；开关方式是编辑 profile 补丁。
@@ -179,6 +189,7 @@ cp /Users/jkfan/AgentProjects/ToolsResearcher/dsh-plugin-session-lightbar/cordis
 - 根元素是 `<button type="button">`，所以 Enter/Space 与单击走同一路径；熄灭点击设置 `previewing=true` 并启动 5 秒定时器，`active = running || previewing` 驱动画布；再次点击会清除旧定时器并重新计时。
 - 画布在 `start` / `renderAt` / `resize` 时用 `getBoundingClientRect` 同步 backing buffer 尺寸（`syncSize`），DPR 上限为 2；`ResizeObserver` 负责布局变化后的重绘。
 - 每个像素的亮度来自 `hash(column, row, time-slice)` 的独立随机值，再用相邻时间片插值；代码里没有 `distance`、前沿、正弦空间波或方向性，因此不会出现波纹。
-- 空闲时只画一层固定的低 alpha 深蓝点阵；运行时用 `level` 在 0.35 秒内淡入/淡出。每格先保留 `baseAlpha = idleAlpha * 0.9` 的底阵，再按 `level × local × energy × 1.5` 叠加随机火花；颜色由 `pixelColor` 按能量选择 deepseek-500 → 450 → 400 → 300 → 200 → white。空闲后 `requestAnimationFrame` 立即停止。
+- 空闲时只画一层固定的低 alpha 深蓝点阵；运行时用 `level` 在 0.35 秒内淡入/淡出。每格先保留 `baseAlpha = idleAlpha * 0.9` 的底阵，再按 `level × local × energy × 1.5` 叠加随机火花。深色由 `pixelColor` 选择 deepseek-500 → 450 → 400 → 300 → 200 → white；浅色选择 deep → navy → royal → blue → peak，低亮度 alpha 额外 ×1.4，运行增益 ×1.6，峰值不出现白色。
+- `isLightTheme()` 读取 `body[data-ds-dark-theme]`（兼容 `html`），并用 `MutationObserver` 监听属性变化；切换主题时 `resize()` 重绘当前帧。深色 palette 读取 `--dsw-static-deepseek-*`，浅色 `lightPalette` 是内置色值。空闲后 `requestAnimationFrame` 立即停止。
 - 画布背景透明，CSS 不设轨道/胶囊/边框；像素的 alpha 决定亮度，`pixelColor` 决定蓝→白的色相。根按钮在熄灭时有 `cursor: pointer` 与 hover 提亮，运行中改为 `cursor: default`。样式用 `<style data-plugin="dsh-plugin-session-lightbar">` 注入，插件模块被卸载时由 DSH 模块系统按 `data-plugin` 清理。
 - 画布最左/最右 5px 用 CSS `mask-image` 渐隐；像素网格本身按设备像素对齐，避免半像素发虚。

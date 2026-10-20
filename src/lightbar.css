@@ -59,11 +59,11 @@
   filter: brightness(1.15) drop-shadow(0 0 3px rgba(86, 134, 254, 0.7));
 }
 
-/* Light surfaces: the same blue/white pixels need more saturation and a
- * blue rim around the white peaks, otherwise they wash out on white. */
-body:not([data-ds-dark-theme]) .dsh-sl[data-active="true"] .dsh-sl__pixels {
-  filter: saturate(1.5) brightness(0.98)
-    drop-shadow(0 0 2px rgba(65, 118, 230, 0.6));
+/* Light surfaces use a separate deep-navy -> saturated-blue ramp; white is
+ * not part of it, so the glow stays blue instead of washing out on white. */
+:root:not([data-ds-dark-theme]) body:not([data-ds-dark-theme]) .dsh-sl[data-active="true"] .dsh-sl__pixels {
+  filter: saturate(0.95) brightness(0.99)
+    drop-shadow(0 0 2px rgba(95, 126, 242, 0.45));
 }
 
 .dsh-sl__pixels {
@@ -97,6 +97,20 @@ body:not([data-ds-dark-theme]) .dsh-sl[data-active="true"] .dsh-sl__pixels {
 .dsh-sl[data-running="false"][data-active="false"]:hover .dsh-sl__pixels,
 .dsh-sl[data-running="false"][data-active="false"]:focus-visible .dsh-sl__pixels {
   filter: brightness(1.8) drop-shadow(0 0 2px rgba(86, 134, 254, 0.3));
+}
+
+/* On light surfaces, brightening only makes the idle grid paler; deepen it
+ * and raise saturation instead. */
+:root:not([data-ds-dark-theme])
+  body:not([data-ds-dark-theme])
+  .dsh-sl[data-running="false"][data-active="false"]:hover
+  .dsh-sl__pixels,
+:root:not([data-ds-dark-theme])
+  body:not([data-ds-dark-theme])
+  .dsh-sl[data-running="false"][data-active="false"]:focus-visible
+  .dsh-sl__pixels {
+  filter: saturate(1.1) brightness(0.93)
+    drop-shadow(0 0 2px rgba(95, 126, 242, 0.28));
 }
 
 @media (prefers-reduced-motion: reduce) {
