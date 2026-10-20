@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Dependencies (none today, but keep the profile/plugin dirs clean)
+node_modules/
+
+# Local logs
+*.log
+
+# Local desktop-profile snapshot used only for uninstall/rollback.
+# It contains machine-specific theme/model settings and is not plugin source.
+cordis.patch.yml.before-lightbar

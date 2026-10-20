@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session pixel array · idle / running</title>
+    <link rel="stylesheet" href="../src/lightbar.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 42px 46px 54px;
+        background: #ececeb;
+        color: #262625;
+      }
+
+      .page-title {
+        margin: 0 0 6px;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .page-note {
+        margin: 0 0 26px;
+        max-width: 720px;
+        color: #77736f;
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .page-note code {
+        font-family: "SF Mono", ui-monospace, monospace;
+        font-size: 11px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 380px);
+        gap: 26px;
+      }
+
+      .panel {
+        width: 380px;
+        overflow: hidden;
+        border-radius: 16px;
+        background: #0d0c12;
+        color: #eceaf0;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.07),
+          0 18px 40px rgba(0, 0, 0, 0.32);
+      }
+
+      .panel__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px 8px;
+      }
+
+      .panel__eyebrow {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: #817c8c;
+        text-transform: uppercase;
+      }
+
+      .panel__status {
+        font-size: 12px;
+        font-weight: 500;
+        color: #8a8580;
+        letter-spacing: 0.02em;
+      }
+
+      .panel__status.is-running {
+        color: #8db6ff;
+        text-shadow: 0 0 10px rgba(86, 134, 254, 0.45);
+      }
+
+      .panel__body {
+        padding: 4px 14px 16px;
+      }
+
+      .fake-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 26px;
+      }
+
+      .fake-dot {
+        width: 5px;
+        height: 5px;
+        flex: none;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.16;
+      }
+
+      .fake-line {
+        height: 6px;
+        border-radius: 4px;
+        background: currentColor;
+        opacity: 0.07;
+      }
+
+      .fake-line.w1 {
+        width: 52%;
+      }
+
+      .fake-line.w2 {
+        width: 68%;
+      }
+
+      .fake-line.w3 {
+        width: 41%;
+      }
+
+      .account {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 44px;
+        margin-top: 8px;
+        padding: 10px 4px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        flex: none;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 30% 22%, #d6a27a, transparent 55%),
+          linear-gradient(145deg, #6f7f8f, #38434d);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 600;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      }
+
+      .account-name {
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .caption {
+        margin: 10px 0 0;
+        color: #77736f;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .replay {
+        margin-top: 24px;
+        border: 1px solid rgba(30, 26, 24, 0.14);
+        border-radius: 999px;
+        background: #fbfbfa;
+        color: #3b3834;
+        padding: 7px 14px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .replay:hover {
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body data-ds-dark-theme>
+    <h1 class="page-title">Session pixel array</h1>
+    <p class="page-note">
+      取消滑轨与端点，只剩一块透明底上的像素阵列。熄灭时每个像素仍在，只保留几乎透明的深蓝；
+      任一会话运行后，每个像素按自己的随机噪声闪动，颜色从 DeepSeek 主题蓝逐级提亮，峰值闪成白色，
+      没有从左到右的波纹或前沿。像素越暗越透明，越亮越接近白色。点击熄灭的阵列可点亮 5 秒，
+      再点一次会重新计时。<code>?live</code> 播放点火，<code>?at=0.4</code> 定格。
+    </p>
+
+    <div class="grid">
+      <div>
+        <section class="panel" aria-label="Idle pixel array">
+          <header class="panel__head">
+            <span class="panel__eyebrow">Session activity</span>
+            <span class="panel__status">Idle</span>
+          </header>
+          <div class="panel__body">
+            <div aria-hidden="true">
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w1"></span></div>
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w2"></span></div>
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w3"></span></div>
+            </div>
+            <button type="button" class="dsh-sl" data-running="false" data-active="false" data-previewing="false" data-wide="true" aria-label="点击亮 5 秒 · Click to light for 5 seconds" title="点击亮 5 秒 · Click to light for 5 seconds">
+              <canvas class="dsh-sl__pixels" aria-hidden="true"></canvas>
+            </button>
+            <div class="account">
+              <span class="avatar">JK</span>
+              <span class="account-name">JK117</span>
+            </div>
+          </div>
+        </section>
+        <p class="caption">熄灭：阵列还在，但每个像素只有 3.5%–9% 的深蓝不透明度；点击点亮 5 秒。</p>
+      </div>
+
+      <div>
+        <section class="panel" aria-label="Running pixel array">
+          <header class="panel__head">
+            <span class="panel__eyebrow">Session activity</span>
+            <span class="panel__status is-running">Running</span>
+          </header>
+          <div class="panel__body">
+            <div aria-hidden="true">
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w1"></span></div>
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w2"></span></div>
+              <div class="fake-row"><span class="fake-dot"></span><span class="fake-line w3"></span></div>
+            </div>
+            <button type="button" class="dsh-sl" data-running="true" data-active="true" data-previewing="false" data-wide="true" aria-label="会话运行中 · Session running" title="会话运行中 · Session running">
+              <canvas class="dsh-sl__pixels" aria-hidden="true"></canvas>
+            </button>
+            <div class="account">
+              <span class="avatar">JK</span>
+              <span class="account-name">JK117</span>
+            </div>
+          </div>
+        </section>
+        <p class="caption">运行：随机蓝火花，从深蓝逐级提亮，峰值白；没有涟漪或方向性。</p>
+      </div>
+    </div>
+
+    <button class="replay" type="button">重新点火</button>
+
+    <script src="../src/flame.js"></script>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const live = params.has("live");
+      const atParam = params.get("at");
+      const at = atParam === null ? null : Number(atParam);
+      const flames = [];
+      let idleBar = null;
+      let idleFlame = null;
+      let idleTimer = null;
+
+      for (const bar of document.querySelectorAll(".dsh-sl")) {
+        const canvas = bar.querySelector(".dsh-sl__pixels");
+        const flame = createFlameRenderer(canvas);
+        const running = bar.getAttribute("data-running") === "true";
+        if (running) {
+          flames.push(flame);
+          if (live) flame.start();
+          else if (at !== null && Number.isFinite(at)) flame.renderAt(at);
+          else flame.renderAt(1.2);
+        } else {
+          idleBar = bar;
+          idleFlame = flame;
+        }
+      }
+
+      if (idleBar !== null && idleFlame !== null) {
+        const idleTitle = idleBar.getAttribute("title");
+        idleBar.addEventListener("click", () => {
+          idleBar.setAttribute("data-active", "true");
+          idleBar.setAttribute("data-previewing", "true");
+          idleBar.title = "已点亮，5 秒后熄灭 · Lit for 5 seconds";
+          idleBar.setAttribute("aria-label", idleBar.title);
+          idleFlame.start();
+          clearTimeout(idleTimer);
+          idleTimer = setTimeout(() => {
+            idleBar.setAttribute("data-active", "false");
+            idleBar.setAttribute("data-previewing", "false");
+            idleBar.title = idleTitle;
+            idleBar.setAttribute("aria-label", idleTitle);
+            idleFlame.stop();
+            idleTimer = null;
+          }, 5000);
+        });
+      }
+
+      document.querySelector(".replay").addEventListener("click", () => {
+        for (const flame of flames) flame.start();
+      });
+    </script>
+  </body>
+</html>
