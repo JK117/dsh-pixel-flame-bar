@@ -31,23 +31,21 @@ DSH 桌面侧边栏插件：在账户行上方放一条透明像素阵列。所�
 
 ## 安装
 
-1. 构建：
+这是一个 DSH bundle：Host half 为空实现，侧边栏像素阵列全部在 Client half（`lib/client.js`）。
+
+1. 构建（修改 `src/` 后必做）：
 
    ```bash
    node scripts/build.mjs
    ```
 
-2. 在 `~/.dsh/profiles/desktop/cordis.patch.yml` 中加入（把路径换成实际位置）：
+2. 在侧边栏「插件」页点 **Add plugin → Install a third-party plugin**，填入本目录的绝对路径。安装会把这个目录以 `link:` 依赖写入 profile，并选中它的 bundle 层。
 
-   ```yaml
-   - insert:
-       - id: pixel-flame-bar
-         name: /absolute/path/to/dsh-pixel-flame-bar/lib/index.js
-   ```
+   安装后插件页会出现「像素火焰条」卡片和开关：关掉卡片开关即禁用整个 bundle，卡片里的 `pixel-flame-bar` 行也可以在开启时单独开关。
 
-3. `Cmd+R` 刷新窗口。**不需要重启应用**。
+3. 首次安装后刷新窗口；之后每次重新构建客户端产物也刷新窗口。
 
-这是纯浏览器插件：Host half 为空实现，`name` 指向入口文件的绝对路径，不是 npm 包，也不需要 `pnpm add`。
+不需要手动编辑 `~/.dsh/profiles/desktop/cordis.patch.yml`。
 
 ## 开发与预览
 
@@ -83,15 +81,15 @@ open "preview/index.html?at=0.4" # 定格秒数
 
 ## 卸载
 
-删除 `cordis.patch.yml` 中 `pixel-flame-bar` 的整个 `- insert:` 块（连同注释），刷新窗口即可。
+在插件页打开「像素火焰条」卡片，点 **Remove**；它会从 profile 的 bundle 列表和依赖中移除，刷新窗口后彻底消失。
 
 本机若保留了不含本插件的 profile 快照 `cordis.patch.yml.before-lightbar`，也可以用它恢复；该文件已在 `.gitignore` 中排除，不会进入仓库。
 
 ## 已知限制
 
 - 只对 Web 客户端生效（`dsh.client.platform: "web"`），不影响 TUI/ACP。
-- 以绝对路径挂载，适合本地开发/自用；分发给别人需要按官方 bundle 规范打包。
-- 它是普通 Loader 行而非 bundle，不会出现在侧边栏「插件」列表里；开关方式是编辑 profile 补丁。
+- 以 `link:` 本地目录安装，适合本地开发/自用；分发给别人需要发布到 registry 或按 bundle 规范打包。
+- 插件页的卡片标题/描述来自 `locale/en.json` 与 `locale/zh.json`，图标来自 `icon.svg`；新增语言需要同时补 `locale/<lang>.json` 并从 `package.json` 的 `exports`/`files` 暴露。
 - 灯条只反映 Host 的 Session `running` 状态，不推断等待审批、后台任务等语义。
 - 点击点亮是本地 5 秒预览，不改变 Host 状态；运行中点击被忽略。
 - 浅色 palette 是内置色值，不跟随 DSH 语义 token 自动变化。
@@ -100,11 +98,14 @@ open "preview/index.html?at=0.4" # 定格秒数
 ## 结构
 
 ```text
-src/client.js    # React 组件、slot 注册、点击逻辑
-src/flame.js     # canvas 像素阵列、主题 palette、随机噪声
-src/lightbar.css # 透明容器、光晕、边缘 mask
-lib/             # 构建产物
-preview/         # 深色/浅色静态预览
-docs/            # 真 HDR 方案（未实现）
-scripts/         # build + smoke test
+src/client.js      # React 组件、slot 注册、点击逻辑
+src/flame.js       # canvas 像素阵列、主题 palette、随机噪声
+src/lightbar.css   # 透明容器、光晕、边缘 mask
+lib/               # 构建产物（Host 入口 + Client bundle）
+cordis.patch.yml   # bundle 补丁：插入 pixel-flame-bar 行
+locale/            # 插件页卡片标题/描述（en/zh）
+icon.svg           # 插件页卡片图标
+preview/           # 深色/浅色静态预览
+docs/              # 真 HDR 方案（未实现）
+scripts/           # build + smoke test
 ```

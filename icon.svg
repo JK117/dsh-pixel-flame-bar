@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Pixel Flame Bar">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0c1526"/>
+      <stop offset="1" stop-color="#111d34"/>
+    </linearGradient>
+    <linearGradient id="ramp" x1="7.45" y1="0" x2="56.55" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1d4ed8"/>
+      <stop offset="0.42" stop-color="#3b82f6"/>
+      <stop offset="0.78" stop-color="#bfdbfe"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="42" cy="32" r="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5686fe" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#5686fe" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <rect width="64" height="64" rx="14" fill="url(#glow)"/>
+  <g fill="url(#ramp)">
+    <g fill-opacity="0.28"><rect x="7.45" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.36"><rect x="13.75" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.44"><rect x="20.05" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.52"><rect x="26.35" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.6"><rect x="32.65" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.7"><rect x="38.95" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.8"><rect x="45.25" y="16.9" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.9"><rect x="51.55" y="16.9" width="5" height="5" rx="0.9"/></g>
+
+    <g fill-opacity="0.38"><rect x="7.45" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.46"><rect x="13.75" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.54"><rect x="20.05" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.64"><rect x="26.35" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.74"><rect x="32.65" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.82"><rect x="38.95" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.9"><rect x="45.25" y="23.2" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.98"><rect x="51.55" y="23.2" width="5" height="5" rx="0.9"/></g>
+
+    <g fill-opacity="0.52"><rect x="7.45" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.62"><rect x="13.75" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.72"><rect x="20.05" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.8"><rect x="26.35" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.88"><rect x="32.65" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.96"><rect x="38.95" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="1"><rect x="45.25" y="29.5" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="1"><rect x="51.55" y="29.5" width="5" height="5" rx="0.9"/></g>
+
+    <g fill-opacity="0.42"><rect x="7.45" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.52"><rect x="13.75" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.62"><rect x="20.05" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.72"><rect x="26.35" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.82"><rect x="32.65" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.9"><rect x="38.95" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.96"><rect x="45.25" y="35.8" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="1"><rect x="51.55" y="35.8" width="5" height="5" rx="0.9"/></g>
+
+    <g fill-opacity="0.28"><rect x="7.45" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.36"><rect x="13.75" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.44"><rect x="20.05" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.54"><rect x="26.35" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.64"><rect x="32.65" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.74"><rect x="38.95" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.84"><rect x="45.25" y="42.1" width="5" height="5" rx="0.9"/></g>
+    <g fill-opacity="0.94"><rect x="51.55" y="42.1" width="5" height="5" rx="0.9"/></g>
+  </g>
+</svg>

@@ -2,17 +2,22 @@
   "name": "dsh-pixel-flame-bar",
   "version": "0.1.0",
   "private": true,
-  "description": "DSH sidebar pixel flame bar: transparent grid, blue-to-white sparkles in dark mode, deep-to-soft blue in light mode, and a 5-second light-up on click.",
+  "description": "DSH sidebar pixel flame bar: a transparent pixel array above the account row that flickers while any session runs, lights up for five seconds on click, and follows the dark and light themes.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
     "lib/index.js",
     "lib/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
     "README.md"
   ],
   "scripts": {
@@ -22,8 +27,12 @@
     "test": "node scripts/smoke-test.mjs"
   },
   "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
     "client": {
       "platform": "web",
+      "immediately": true,
       "inject": [
         "@deepseek-ai/dsh-client-ui-renderer",
         "@deepseek-ai/dsh-client-ui-sidebar"

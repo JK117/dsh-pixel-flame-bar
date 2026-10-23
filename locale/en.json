@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Pixel Flame Bar",
+    "description": "Adds a transparent pixel array above the sidebar account row: it flickers while a session runs, lights up for five seconds on click, and follows the dark or light theme."
+  }
+}

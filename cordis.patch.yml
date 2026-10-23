@@ -1,0 +1,7 @@
+# Bundle layer for the pixel flame bar.
+#
+# One Host row and no Host behavior: the sidebar array lives entirely in the
+# Client module (`lib/client.js`), built from `src/`.
+- insert:
+    - id: pixel-flame-bar
+      name: dsh-pixel-flame-bar
